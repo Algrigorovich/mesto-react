@@ -4,7 +4,7 @@ const PopupWithForm = (props) => {
       <div className="popup__container">
         <button className="popup__close" type="button" aria-label="Закрыть" onClick={props.onClose}></button>
         <h2 className="popup__title">{props.title}</h2>
-        <form action="/" method="post" className="popup-form" name={props.name} id={`${props.name}-form`}>
+        <form action="/" method="post" className="popup-form" name={props.name} id={`${props.name}-form`} onSubmit={props.onSubmit}>
           {props.children}
           <button className="popup-form__submit" type="submit">
             {props.buttonText}
