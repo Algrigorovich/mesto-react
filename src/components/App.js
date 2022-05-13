@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import api from '../utils/Api';
+import api from '../utils/api';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
@@ -19,9 +19,10 @@ function App() {
   const [cards, setCards] = useState([]);
 
   useEffect(() => {
-    api.getProfileData()
-      .then((user) => {
+    Promise.all([api.getProfileData(), api.getInitialCards()])
+      .then(([user, cardList]) => {
         setCurrentUser(user);
+        setCards(cardList);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -33,62 +34,51 @@ function App() {
         closeAllPopups();
       })
       .catch((err) => console.log(err));
-  }
+  };
 
   const handleUpdateAvatar = ({avatar}) => {
     api.updateAvatar(avatar)
-    .then(() => {
-
-      setCurrentUser({ ...currentUser, avatar });
-      closeAllPopups();
-    })
-    .catch((err) => console.log(err));
-  }
-
-  useEffect(() => {
-      api.getInitialCards()
-        .then((cardList) => {
-          setCards(cardList);
-        })
-        .catch((err) => console.log(err));
-    }, []);
+      .then(() => {
+        setCurrentUser({...currentUser, avatar});
+        closeAllPopups();
+      })
+      .catch((err) => console.log(err));
+  };
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    const isLiked = card.likes.some((i) => i._id === currentUser._id);
+    const likeAction = isLiked
+    ? api.deleteCardLike(card._id)
+    : api.setCardLike(card._id);
 
-    if (!isLiked) {
-      api.setCardLike(card._id).then((newCard) => {
-        console.log(newCard, 'newCard')
+    likeAction
+      .then((newCard) => {
         setCards((state) => state.map((c) => (c._id === card._id ? newCard : c)));
-      }).catch((err) => {
+      })
+      .catch((err) => {
         console.error(err);
       });
-    } else {
-      api.deleteCardLike(card._id).then((newCard) => {
-        setCards((state) => state.map((c) => (c._id === card._id ? newCard : c)));
-      }).catch((err) => {
-        console.error(err);
-      });
-    }
   }
 
   function handleCardDelete(card) {
     api.deleteCard(card._id)
       .then(() => {
         setCards((items) => items.filter((c) => c._id !== card._id && c));
-      }).catch((err) => {
+      })
+      .catch((err) => {
         console.error(err);
       });
   }
 
-  function handleAddPlaceSubmit({name,link}) {
+  function handleAddPlaceSubmit({name, link}) {
     api.addCard(name, link)
-    .then((newCard) => {
-      setCards([newCard, ...cards]);
-      closeAllPopups();
-    }).catch((err) => {
-      console.error(err);
-    });
+      .then((newCard) => {
+        setCards([newCard, ...cards]);
+        closeAllPopups();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
   const handleEditAvatarClick = () => {
@@ -115,6 +105,7 @@ function App() {
       <div className="page">
         <div className="page__container">
           <Header />
+
           <Main
             onEditAvatarClick={handleEditAvatarClick}
             onEditProfileClick={handleEditProfileClick}
@@ -126,13 +117,29 @@ function App() {
           />
           <Footer />
 
-          <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
+          <EditAvatarPopup
+            isOpen={isEditAvatarPopupOpen}
+            onClose={closeAllPopups}
+            onUpdateAvatar={handleUpdateAvatar}
+          />
 
-          <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
+          <EditProfilePopup
+            isOpen={isEditProfilePopupOpen}
+            onClose={closeAllPopups}
+            onUpdateUser={handleUpdateUser}
+          />
 
-          <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit}/>
+          <AddPlacePopup
+            isOpen={isAddPlacePopupOpen}
+            onClose={closeAllPopups}
+            onAddPlace={handleAddPlaceSubmit}
+          />
 
-          <PopupWithForm name="confirm" title="Вы уверены?" buttonText="Да"></PopupWithForm>
+          <PopupWithForm
+            name="confirm"
+            title="Вы уверены?"
+            buttonText="Да"
+          />
 
           <ImagePopup card={selectedCard} onClose={closeAllPopups} />
         </div>
@@ -142,3 +149,4 @@ function App() {
 }
 
 export default App;
+console.log('Спасибо за ревью =)')

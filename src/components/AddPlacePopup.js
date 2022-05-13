@@ -1,7 +1,7 @@
 import PopupWithForm from './PopupWithForm';
 import {useState, useEffect} from 'react';
- const AddPlacePopup = (props) => {
 
+const AddPlacePopup = ({isOpen, onClose, onAddPlace}) => {
   const [link, setLink] = useState('');
   const [name, setName] = useState('');
 
@@ -12,10 +12,11 @@ import {useState, useEffect} from 'react';
 
   function handleSubmit(e) {
     e.preventDefault();
-    props.onAddPlace({
+    onAddPlace({
       name,
       link,
     });
+    e.target.reset();
   }
 
   function handleChangeName(e) {
@@ -30,14 +31,15 @@ import {useState, useEffect} from 'react';
     <PopupWithForm
       name="add-item"
       title="Новое место"
-      isOpen={props.isOpen}
-      onClose={props.onClose}
+      isOpen={isOpen}
+      onClose={onClose}
       buttonText="Создать"
       onSubmit={handleSubmit}
     >
       <label htmlFor="card-title" className="popup-form__field">
         <input
           type="text"
+          value={name}
           className="popup-form__input"
           required
           id="card-title"
@@ -54,6 +56,7 @@ import {useState, useEffect} from 'react';
           type="url"
           className="popup-form__input"
           required
+          value={link}
           id="card-link"
           name="card-link"
           placeholder="Ссылка на картинку"
@@ -62,6 +65,6 @@ import {useState, useEffect} from 'react';
         <span className="popup-form__input-error card-link-input-error popup-form__input-error_active">Ошибка</span>
       </label>
     </PopupWithForm>
-  )
-}
+  );
+};
 export default AddPlacePopup;
