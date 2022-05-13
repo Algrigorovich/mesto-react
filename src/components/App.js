@@ -149,4 +149,3 @@ function App() {
 }
 
 export default App;
-console.log('Спасибо за ревью =)')
