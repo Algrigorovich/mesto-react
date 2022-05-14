@@ -9,5 +9,3 @@
 - БЭМ (nested)
 - Grid, flex (css)
 - React
-> “you are breathtaking”!
-![You're breathtaking](https://memepedia.ru/wp-content/uploads/2019/06/keanu-meme.jpg)
